@@ -2,7 +2,8 @@ import torch
 
 
 class AverageMeter(object):
-    """Computes and stores the average and current value"""
+    """ Function to Compute and store the average and current value
+    """
 
     def __init__(self):
         self.reset()
@@ -21,11 +22,11 @@ class AverageMeter(object):
 
 
 def calculate_psnr(img1, img2):
-    """
+    """ Function to calculate the Peak Signal to Noise Ratio (PSNR)
 
-    :param img1:
-    :param img2:
-    :return:
+    :param img1: model output Isr image
+    :param img2: ground truth Ihr image
+    :return: Peak Signal to Noise Ratio between two images
     """
 
     return 10. * torch.log10(1. / torch.mean((img1 - img2) ** 2))

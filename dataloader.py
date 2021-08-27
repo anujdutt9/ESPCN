@@ -9,6 +9,9 @@ from torch.utils.data import IterableDataset, DataLoader
 
 # Train Dataset Class
 class SRTrainDataset(IterableDataset):
+    """
+        Training Dataset Class
+    """
     def __init__(self, dirpath_images, scaling_factor, patch_size, stride):
         """
 
@@ -68,6 +71,9 @@ class SRTrainDataset(IterableDataset):
 
 # Valid Dataset Class
 class SRValidDataset(IterableDataset):
+    """
+        Validation Dataset Class
+    """
     def __init__(self, dirpath_images, scaling_factor):
         """
 
@@ -110,6 +116,9 @@ class SRValidDataset(IterableDataset):
 
 # Ref.: https://discuss.pytorch.org/t/how-to-shuffle-an-iterable-dataset/64130/6
 class ShuffleDataset(IterableDataset):
+    """
+        Class to Shuffle the Iterable Dataset
+    """
     def __init__(self, dataset, buffer_size):
         super().__init__()
         self.dataset = dataset
@@ -141,7 +150,7 @@ class ShuffleDataset(IterableDataset):
 
 # Function to return train/val data loader
 def get_data_loader(dirpath_train, dirpath_val, scaling_factor, patch_size, stride):
-    """
+    """ Train/Validation data loader function
 
     :param dirpath_train (str): path to directory containing high resolution training images
     :param dirpath_val (str): path to directory containing high resolution validation images

@@ -3,6 +3,9 @@ import torch.nn as nn
 
 
 class ESPCN(nn.Module):
+    """
+        ESPCN Model class
+    """
     def __init__(self, num_channels, scale_factor):
         """
 
@@ -35,7 +38,7 @@ class ESPCN(nn.Module):
         )
 
     def forward(self, x):
-        """
+        """ Forward function
 
         :param x (torch.Tensor): input image
         :return: model output

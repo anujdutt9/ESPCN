@@ -14,7 +14,7 @@ from dataloader import get_data_loader
 
 
 def train(model, train_loader, device, criterion, optimizer):
-    """
+    """ Function to train the model
 
     :param model: instantiated model
     :param train_loader: training data loader
@@ -45,7 +45,7 @@ def train(model, train_loader, device, criterion, optimizer):
 
 
 def evaluate(model, val_loader, device, criterion):
-    """
+    """ Function to evaluate the model
 
     :param model: instantiated model
     :param val_loader: validation data loader
@@ -77,7 +77,7 @@ def evaluate(model, val_loader, device, criterion):
 
 
 def main(args):
-    """
+    """ Function to train, evaluate and save the best model
 
     :param args: argument parser instance
     :return: model with best trained weights
