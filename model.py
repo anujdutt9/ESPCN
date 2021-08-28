@@ -1,13 +1,14 @@
+# Import Dependencies
 import torch
 import torch.nn as nn
 
 
 class ESPCN(nn.Module):
-    def __init__(self, num_channels, scale_factor):
-        """
+    def __init__(self, num_channels, scaling_factor):
+        """ ESPCN Model class
 
         :param num_channels (int): Number of channels in input image
-        :param scale_factor (int): Factor to scale-up the input image by
+        :param scaling_factor (int): Factor to scale-up the input image by
         """
 
         super(ESPCN, self).__init__()
@@ -28,17 +29,17 @@ class ESPCN(nn.Module):
 
         self.sub_pixel_layer = nn.Sequential(
             # f3 = 3, # output shape: H x W x (C x r**2)
-            nn.Conv2d(in_channels=32, kernel_size=(3, 3), out_channels=num_channels * (scale_factor ** 2), padding=(1, 1)),
+            nn.Conv2d(in_channels=32, kernel_size=(3, 3), out_channels=num_channels * (scaling_factor ** 2), padding=(1, 1)),
             # Sub-Pixel Convolution Layer - PixelShuffle
             # rearranges: H x W x (C x r**2) => rH x rW x C
-            nn.PixelShuffle(upscale_factor=scale_factor)
+            nn.PixelShuffle(upscale_factor=scaling_factor)
         )
 
     def forward(self, x):
         """
 
-        :param x:
-        :return:
+        :param x: input image
+        :return: model output
         """
 
         # inputs: H x W x C
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     sample_input = torch.rand(size=(1, 1, 224, 224))
     print("Input shape: ", sample_input.shape)
 
-    model = ESPCN(num_channels=1, scale_factor=3)
+    model = ESPCN(num_channels=1, scaling_factor=3)
     print(f"\n{model}\n")
 
     # Forward pass with sample input
