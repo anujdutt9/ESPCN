@@ -13,14 +13,14 @@ from dataloader import get_data_loader
 
 
 def train(model, train_loader, device, criterion, optimizer):
-    """
+    """ Function to train the model
 
-    :param model:
-    :param train_loader:
-    :param device:
-    :param criterion:
-    :param optimizer:
-    :return:
+    :param model: instance of model
+    :param train_loader: training data loader
+    :param device: training device, 'cpu', 'cuda'
+    :param criterion: loss criterion, MSE
+    :param optimizer: model optimizer, Adam
+    :return: running training loss
     """
 
     model.train()
@@ -44,12 +44,12 @@ def train(model, train_loader, device, criterion, optimizer):
 
 
 def evaluate(model, val_loader, device, criterion):
-    """
+    """ Function to evaluate the model
 
-    :param model:
-    :param val_loader:
-    :param device:
-    :return:
+    :param model: instance of the model
+    :param val_loader: validation data loader
+    :param device: training device, 'cpu', 'cuda'
+    :return: model predictions, running PSNR, running validation loss
     """
 
     # Evaluate the Model
@@ -76,10 +76,10 @@ def evaluate(model, val_loader, device, criterion):
 
 
 def main(args):
-    """
+    """ Main function to train/evaluate the model
 
-    :param args:
-    :return:
+    :param args: model input arguments
+    :return: best trained model
     """
 
     # Set device
@@ -114,7 +114,7 @@ def main(args):
         break
 
     # Get the Model
-    model = ESPCN(num_channels=1, scale_factor=args.scaling_factor)
+    model = ESPCN(num_channels=1, scaling_factor=args.scaling_factor)
     model.to(device)
 
     wandb.watch(model)
