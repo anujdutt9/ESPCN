@@ -8,16 +8,18 @@ import matplotlib.pyplot as plt
 from torch.utils.data import IterableDataset, DataLoader
 
 
+# Ref.: https://github.com/yjn870/ESPCN-pytorch/blob/ab84ee1bccb2978f2f9b88f9e0315d9be12c099e/prepare.py#L16
 # Train Dataset Class
 class SRTrainDataset(IterableDataset):
     def __init__(self, dirpath_images, scaling_factor, patch_size, stride):
+        """ Training Dataset
+
+        :param dirpath_images: path to training images directory
+        :param scaling_factor: up-scaling factor to use, default = 3
+        :param patch_size: size of sub-images to be extracted
+        :param stride: stride used for extracting sub-images
         """
 
-        :param dirpath_images:
-        :param scaling_factor:
-        :param patch_size:
-        :param stride:
-        """
         self.dirpath_images = dirpath_images
         self.scaling_factor = scaling_factor
         self.patch_size = patch_size
@@ -57,7 +59,8 @@ class SRTrainDataset(IterableDataset):
                     # lr_crop: w = 17, h = 17
                     lr_crop = lr_y[i:i + self.patch_size, j:j + self.patch_size]
                     # hr_crop: w = 17 * r, h = 17 * r
-                    hr_crop = hr_y[i * self.scaling_factor:i * self.scaling_factor + self.patch_size * self.scaling_factor, j * self.scaling_factor:j * self.scaling_factor + self.patch_size * self.scaling_factor]
+                    hr_crop = hr_y[i * self.scaling_factor:i * self.scaling_factor + self.patch_size * self.scaling_factor,
+                              j * self.scaling_factor:j * self.scaling_factor + self.patch_size * self.scaling_factor]
                     lr_crop = np.expand_dims(lr_crop / 255.0, axis=0)
                     hr_crop = np.expand_dims(hr_crop / 255.0, axis=0)
                     yield lr_crop, hr_crop
@@ -69,11 +72,12 @@ class SRTrainDataset(IterableDataset):
 # Valid Dataset Class
 class SRValidDataset(IterableDataset):
     def __init__(self, dirpath_images, scaling_factor):
+        """ Validation Dataset
+
+        :param dirpath_images: path to validation images directory
+        :param scaling_factor: up-scaling factor to use, default = 3
         """
 
-        :param dirpath_images:
-        :param scaling_factor:
-        """
         self.dirpath_images = dirpath_images
         self.scaling_factor = scaling_factor
 
@@ -139,9 +143,8 @@ class ShuffleDataset(IterableDataset):
             pass
 
 
-# Function to return train/val data loader
 def get_data_loader(dirpath_train, dirpath_val, scaling_factor, patch_size, stride):
-    """
+    """ Function to return train/val data loader
 
     :param dirpath_train (str): path to directory containing high resolution training images
     :param dirpath_val (str): path to directory containing high resolution validation images
@@ -171,6 +174,7 @@ def get_data_loader(dirpath_train, dirpath_val, scaling_factor, patch_size, stri
 
 
 if __name__ == '__main__':
+    # Test DataLoaders
     train_loader, val_loader = get_data_loader(dirpath_train="./dataset/train",
                                                dirpath_val="./dataset/val",
                                                scaling_factor=3,
@@ -190,7 +194,6 @@ if __name__ == '__main__':
         lr = lr_image[0].numpy().transpose(1, 2, 0)
         hr = hr_image[0].numpy().transpose(1, 2, 0)
         print(f"{lr.shape}, {hr.shape}")
-        print(f"{type(lr)}, {type(hr)}")
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         ax1.imshow(lr)
         ax1.set_title("Low Res")
