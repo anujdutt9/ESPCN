@@ -39,8 +39,8 @@ class SRTrainDataset(IterableDataset):
             lr_image = np.array(lr_image).astype(np.float32)
 
             # Convert BGR to YCbCr
-            hr_image = cv2.cvtColor(hr_image, cv2.COLOR_BGR2YCrCb)
-            lr_image = cv2.cvtColor(lr_image, cv2.COLOR_BGR2YCrCb)
+            hr_image = cv2.cvtColor(hr_image, cv2.COLOR_RGB2YCrCb)
+            lr_image = cv2.cvtColor(lr_image, cv2.COLOR_RGB2YCrCb)
 
             # As per paper, using only the luminescence channel gave the best outcome
             hr_y = hr_image[:, :, 0]
