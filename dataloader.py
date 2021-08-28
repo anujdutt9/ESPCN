@@ -2,6 +2,7 @@ import os
 import cv2
 import random
 import numpy as np
+from PIL import Image
 from glob import glob
 import matplotlib.pyplot as plt
 from torch.utils.data import IterableDataset, DataLoader
@@ -9,16 +10,13 @@ from torch.utils.data import IterableDataset, DataLoader
 
 # Train Dataset Class
 class SRTrainDataset(IterableDataset):
-    """
-        Training Dataset Class
-    """
     def __init__(self, dirpath_images, scaling_factor, patch_size, stride):
         """
 
-        :param dirpath_images (str): path to HR images directory
-        :param scaling_factor (int): value by which to scale the HR to LR images
-        :param patch_size (int): sub-images size
-        :param stride (int): stride for extracting sub-images
+        :param dirpath_images:
+        :param scaling_factor:
+        :param patch_size:
+        :param stride:
         """
         self.dirpath_images = dirpath_images
         self.scaling_factor = scaling_factor
@@ -28,18 +26,17 @@ class SRTrainDataset(IterableDataset):
     def __iter__(self):
         for fpath_image in glob(os.path.join(self.dirpath_images, "*.png")):
             # Load HR image: rH x rW x C, r: scaling factor
-            hr_image = cv2.imread(fpath_image).astype(np.float32) / 255.0
-            hr_width = (hr_image.shape[1] // self.scaling_factor) * self.scaling_factor
-            hr_height = (hr_image.shape[0] // self.scaling_factor) * self.scaling_factor
-            hr_image = cv2.resize(hr_image, (hr_width, hr_height), interpolation=cv2.INTER_CUBIC)
+            hr_image = Image.open(fpath_image).convert('RGB')
+            hr_width = (hr_image.width // self.scaling_factor) * self.scaling_factor
+            hr_height = (hr_image.height // self.scaling_factor) * self.scaling_factor
+            hr_image = hr_image.resize((hr_width, hr_height), resample=Image.BICUBIC)
 
             # LR Image: H x W x C
             # As in paper, Sec. 3.2: sub-sample images by up-scaling factor
-            lr_image = cv2.resize(hr_image,
-                                  (hr_image.shape[1] // self.scaling_factor, hr_image.shape[0] // self.scaling_factor),
-                                  interpolation=cv2.INTER_CUBIC) / 255.0
-            assert lr_image.shape[0] == hr_image.shape[0] // self.scaling_factor
-            assert lr_image.shape[1] == hr_image.shape[1] // self.scaling_factor
+            lr_image = hr_image.resize((hr_width // self.scaling_factor, hr_height // self.scaling_factor), resample=Image.BICUBIC)
+
+            hr_image = np.array(hr_image).astype(np.float32)
+            lr_image = np.array(lr_image).astype(np.float32)
 
             # Convert BGR to YCbCr
             hr_image = cv2.cvtColor(hr_image, cv2.COLOR_BGR2YCrCb)
@@ -61,8 +58,8 @@ class SRTrainDataset(IterableDataset):
                     lr_crop = lr_y[i:i + self.patch_size, j:j + self.patch_size]
                     # hr_crop: w = 17 * r, h = 17 * r
                     hr_crop = hr_y[i * self.scaling_factor:i * self.scaling_factor + self.patch_size * self.scaling_factor, j * self.scaling_factor:j * self.scaling_factor + self.patch_size * self.scaling_factor]
-                    lr_crop = np.expand_dims(lr_crop, axis=0)
-                    hr_crop = np.expand_dims(hr_crop, axis=0)
+                    lr_crop = np.expand_dims(lr_crop / 255.0, axis=0)
+                    hr_crop = np.expand_dims(hr_crop / 255.0, axis=0)
                     yield lr_crop, hr_crop
 
     def __len__(self):
@@ -71,14 +68,11 @@ class SRTrainDataset(IterableDataset):
 
 # Valid Dataset Class
 class SRValidDataset(IterableDataset):
-    """
-        Validation Dataset Class
-    """
     def __init__(self, dirpath_images, scaling_factor):
         """
 
-        :param dirpath_images (str): path to HR validation images
-        :param scaling_factor (int): value by which to scale the HR to LR images
+        :param dirpath_images:
+        :param scaling_factor:
         """
         self.dirpath_images = dirpath_images
         self.scaling_factor = scaling_factor
@@ -86,28 +80,28 @@ class SRValidDataset(IterableDataset):
     def __iter__(self):
         for fpath_image in glob(os.path.join(self.dirpath_images, "*.png")):
             # Load HR image: rH x rW x C, r: scaling factor
-            hr_image = cv2.imread(fpath_image).astype(np.float32) / 255.0
-            hr_width = (hr_image.shape[1] // self.scaling_factor) * self.scaling_factor
-            hr_height = (hr_image.shape[0] // self.scaling_factor) * self.scaling_factor
-            hr_image = cv2.resize(hr_image, (hr_width, hr_height), interpolation=cv2.INTER_CUBIC)
+            hr_image = Image.open(fpath_image).convert('RGB')
+            hr_width = (hr_image.width // self.scaling_factor) * self.scaling_factor
+            hr_height = (hr_image.height // self.scaling_factor) * self.scaling_factor
+            hr_image = hr_image.resize((hr_width, hr_height), resample=Image.BICUBIC)
 
             # LR Image: H x W x C
-            lr_image = cv2.resize(hr_image,
-                                  (hr_image.shape[1] // self.scaling_factor, hr_image.shape[0] // self.scaling_factor),
-                                  interpolation=cv2.INTER_CUBIC) / 255.0
-            assert lr_image.shape[0] == hr_image.shape[0] // self.scaling_factor
-            assert lr_image.shape[1] == hr_image.shape[1] // self.scaling_factor
+            # As in paper, Sec. 3.2: sub-sample images by up-scaling factor
+            lr_image = hr_image.resize((hr_width // self.scaling_factor, hr_height // self.scaling_factor), resample=Image.BICUBIC)
+
+            hr_image = np.array(hr_image).astype(np.float32)
+            lr_image = np.array(lr_image).astype(np.float32)
 
             # Convert BGR to YCbCr
-            hr_image = cv2.cvtColor(hr_image, cv2.COLOR_BGR2YCrCb)
-            lr_image = cv2.cvtColor(lr_image, cv2.COLOR_BGR2YCrCb)
+            hr_image = cv2.cvtColor(hr_image, cv2.COLOR_RGB2YCrCb)
+            lr_image = cv2.cvtColor(lr_image, cv2.COLOR_RGB2YCrCb)
 
             # As per paper, using only the luminescence channel gave the best outcome
             hr_y = hr_image[:, :, 0]
             lr_y = lr_image[:, :, 0]
 
-            lr_y = np.expand_dims(lr_y, axis=0)
-            hr_y = np.expand_dims(hr_y, axis=0)
+            lr_y = np.expand_dims(lr_y / 255.0, axis=0)
+            hr_y = np.expand_dims(hr_y / 255.0, axis=0)
             yield lr_y, hr_y
 
     def __len__(self):
@@ -116,9 +110,6 @@ class SRValidDataset(IterableDataset):
 
 # Ref.: https://discuss.pytorch.org/t/how-to-shuffle-an-iterable-dataset/64130/6
 class ShuffleDataset(IterableDataset):
-    """
-        Class to Shuffle the Iterable Dataset
-    """
     def __init__(self, dataset, buffer_size):
         super().__init__()
         self.dataset = dataset
@@ -150,7 +141,7 @@ class ShuffleDataset(IterableDataset):
 
 # Function to return train/val data loader
 def get_data_loader(dirpath_train, dirpath_val, scaling_factor, patch_size, stride):
-    """ Train/Validation data loader function
+    """
 
     :param dirpath_train (str): path to directory containing high resolution training images
     :param dirpath_val (str): path to directory containing high resolution validation images
@@ -161,13 +152,13 @@ def get_data_loader(dirpath_train, dirpath_val, scaling_factor, patch_size, stri
     """
     # As per paper, Sec. 3.2, sub-images are extracted only during the training phase
     dataset = SRTrainDataset(dirpath_images=dirpath_train,
-                            scaling_factor=scaling_factor,
-                            patch_size=patch_size,
-                            stride=stride)
+                             scaling_factor=scaling_factor,
+                             patch_size=patch_size,
+                             stride=stride)
     train_dataset = ShuffleDataset(dataset, 1024)
     train_loader = DataLoader(train_dataset,
-                              batch_size=512,
-                              num_workers=8,
+                              batch_size=16,
+                              num_workers=4,
                               pin_memory=True)
 
     valid_dataset = SRValidDataset(dirpath_images=dirpath_val,
@@ -180,8 +171,8 @@ def get_data_loader(dirpath_train, dirpath_val, scaling_factor, patch_size, stri
 
 
 if __name__ == '__main__':
-    train_loader, val_loader = get_data_loader(dirpath_train="./dataset/DIV2K_train_HR",
-                                               dirpath_val="./dataset/DIV2K_valid_HR",
+    train_loader, val_loader = get_data_loader(dirpath_train="./dataset/train",
+                                               dirpath_val="./dataset/val",
                                                scaling_factor=3,
                                                patch_size=17,
                                                stride=13)
@@ -198,6 +189,8 @@ if __name__ == '__main__':
         print(f"lr_image: {lr_image.shape}, hr_image: {hr_image.shape}")
         lr = lr_image[0].numpy().transpose(1, 2, 0)
         hr = hr_image[0].numpy().transpose(1, 2, 0)
+        print(f"{lr.shape}, {hr.shape}")
+        print(f"{type(lr)}, {type(hr)}")
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         ax1.imshow(lr)
         ax1.set_title("Low Res")

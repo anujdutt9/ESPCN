@@ -3,9 +3,6 @@ import torch.nn as nn
 
 
 class ESPCN(nn.Module):
-    """
-        ESPCN Model class
-    """
     def __init__(self, num_channels, scale_factor):
         """
 
@@ -38,10 +35,10 @@ class ESPCN(nn.Module):
         )
 
     def forward(self, x):
-        """ Forward function
+        """
 
-        :param x (torch.Tensor): input image
-        :return: model output
+        :param x:
+        :return:
         """
 
         # inputs: H x W x C
@@ -55,10 +52,10 @@ class ESPCN(nn.Module):
 
 if __name__ == '__main__':
     # Print and Test model outputs with a random input Tensor
-    sample_input = torch.rand(size=(1, 3, 224, 224))
+    sample_input = torch.rand(size=(1, 1, 224, 224))
     print("Input shape: ", sample_input.shape)
 
-    model = ESPCN(num_channels=3, scale_factor=3)
+    model = ESPCN(num_channels=1, scale_factor=3)
     print(f"\n{model}\n")
 
     # Forward pass with sample input

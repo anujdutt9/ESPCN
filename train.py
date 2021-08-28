@@ -7,21 +7,20 @@ from argparse import ArgumentParser
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from utils import AverageMeter, calculate_psnr
 from model import ESPCN
 from dataloader import get_data_loader
 
 
 def train(model, train_loader, device, criterion, optimizer):
-    """ Function to train the model
+    """
 
-    :param model: instantiated model
-    :param train_loader: training data loader
-    :param device: 'cpu', 'cuda'
-    :param criterion: loss criterion, MSE
-    :param optimizer: model optimizer, Adam
-    :return: running training loss
+    :param model:
+    :param train_loader:
+    :param device:
+    :param criterion:
+    :param optimizer:
+    :return:
     """
 
     model.train()
@@ -45,12 +44,12 @@ def train(model, train_loader, device, criterion, optimizer):
 
 
 def evaluate(model, val_loader, device, criterion):
-    """ Function to evaluate the model
+    """
 
-    :param model: instantiated model
-    :param val_loader: validation data loader
-    :param device: 'cpu', 'cuda'
-    :return: model prediction on validation data, running PSNR value, validation loss
+    :param model:
+    :param val_loader:
+    :param device:
+    :return:
     """
 
     # Evaluate the Model
@@ -77,10 +76,10 @@ def evaluate(model, val_loader, device, criterion):
 
 
 def main(args):
-    """ Function to train, evaluate and save the best model
+    """
 
-    :param args: argument parser instance
-    :return: model with best trained weights
+    :param args:
+    :return:
     """
 
     # Set device
@@ -97,10 +96,22 @@ def main(args):
 
     # Get dataloaders
     train_loader, val_loader = get_data_loader(dirpath_train=args.dirpath_train,
-                                                dirpath_val=args.dirpath_val,
-                                                scaling_factor=args.scaling_factor,
-                                                patch_size=args.patch_size,
-                                                stride=args.stride)
+                                               dirpath_val=args.dirpath_val,
+                                               scaling_factor=args.scaling_factor,
+                                               patch_size=args.patch_size,
+                                               stride=args.stride)
+
+    for idx, (lr_image, hr_image) in enumerate(train_loader):
+        print(f"Training - lr_image: {lr_image.shape}, hr_image: {hr_image.shape}")
+        print(f"Training - lr_image: {type(lr_image[0])}, hr_image: {type(hr_image[0])}")
+        print(f"Training - lr_image: {lr_image[0]}, hr_image: {hr_image[0]}\n")
+        break
+
+    for idx, (lr_image, hr_image) in enumerate(val_loader):
+        print(f"Validation - lr_image: {lr_image.shape}, hr_image: {hr_image.shape}")
+        print(f"Validation - lr_image: {type(lr_image[0])}, hr_image: {type(hr_image[0])}")
+        print(f"Validation - lr_image: {lr_image[0]}, hr_image: {hr_image[0]}\n")
+        break
 
     # Get the Model
     model = ESPCN(num_channels=1, scale_factor=args.scaling_factor)
@@ -116,9 +127,6 @@ def main(args):
         {'params': model.sub_pixel_layer.parameters(), 'lr': args.learning_rate * 0.1}
     ], lr=args.learning_rate)
 
-    # LR Scheduler
-    scheduler = ReduceLROnPlateau(optimizer, mode='min')
-
     # Train the Model
     best_weights = copy.deepcopy(model.state_dict())
     best_epoch = 0
@@ -132,7 +140,6 @@ def main(args):
         torch.save(model.state_dict(), os.path.join(args.dirpath_out, 'epoch_{}.pth'.format(epoch)))
 
         preds, running_psnr, validation_loss = evaluate(model, val_loader, device, criterion)
-        scheduler.step(validation_loss.avg)
 
         if running_psnr.avg > best_psnr:
             best_epoch = epoch
@@ -171,7 +178,7 @@ def build_parser():
                         help="Optional. Image Up-scaling factor.")
     parser.add_argument("-s", "--stride", default=13, required=False, type=int,
                         help="Optional. Sub-image extraction stride.")
-    parser.add_argument("-epochs", "--epochs", default=100, required=False, type=int,
+    parser.add_argument("-epochs", "--epochs", default=200, required=False, type=int,
                         help="Optional. Number of training epochs.")
     parser.add_argument("-lr", "--learning_rate", default=1e-3, required=False, type=float,
                         help="Optional. Learning Rate.")
