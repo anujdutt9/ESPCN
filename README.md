@@ -20,6 +20,12 @@ $ python train.py -t ./dataset/train -v ./dataset/val -o ./assets/models/
 
 This will train the model and save the model's weights as `state_dict()` to the `assets/models/` folder.
 
+Here's a GIF of model predictions during training:
+
+![Alt Text](./assets/outputs/output.gif)
+
+If you see the face carefully, as the model learns and the PSNR value increases, the boxes/lines from the image and face start to disappear.
+
 # Inference
 
 This repository comes with pre-trained model as well. To directly run inference on images, use the following command:
