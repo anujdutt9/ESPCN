@@ -166,3 +166,22 @@ If you find a bug or have any other issue/question, please create a GitHub issue
   biburl    = {https://dblp.org/rec/journals/corr/ShiCHTABRW16.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
+```
+
+[Is the deconvolution layer the same as a convolutional layer? A note on Real­Time Single Image and Video Super­Resolution Using an Efficient Sub­Pixel Convolutional Neural Network.](https://arxiv.org/pdf/1609.07009.pdf)
+
+```
+@article{article,
+author = {Shi, Wenzhe and 
+          Caballero, Jose and 
+          Theis, Lucas and 
+          Huszar, Ferenc and 
+          Aitken, Andrew and 
+          Ledig, Christian and 
+          Wang, Zehan},
+year = {2016},
+month = {09},
+pages = {},
+title = {Is the deconvolution layer the same as a convolutional layer?}
+}
+```
