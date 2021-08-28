@@ -120,7 +120,7 @@ Note that the up-scaling factor for bi-cubic up-sampling and the super-resolutio
 
 # Contributions
 
-If you find a bug, create a GitHub issue, or even better, submit a pull request. Similarly, if you have questions, simply post them as GitHub issues.
+If you find a bug or have any other issue/question, please create a GitHub issue, or submit a pull request.
 
 # Credits
 
