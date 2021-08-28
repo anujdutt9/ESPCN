@@ -77,7 +77,7 @@ def infer(args):
     cudnn.benchmark = True
 
     # Load Model
-    model = ESPCN(num_channels=1, scale_factor=args.scaling_factor)
+    model = ESPCN(num_channels=1, scaling_factor=args.scaling_factor)
     model.load_state_dict(torch.load(args.fpath_weights))
     model.to(device)
     model.eval()
