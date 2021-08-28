@@ -44,6 +44,24 @@ The `export.py` script provide five options for exporting the model - ONNX, Core
 $ python export.py -i ./assets/models/best.pth -o ./assets/models -f TFLite
 ```
 
+# Model Statistics
+
+The following are the model statistics for an input image of shape `[1, 1, 224, 224]`:
+
+```
+Input size (MB): 0.20
+Forward/backward pass size (MB): 42.15
+Params size (MB): 0.09
+Estimated Total Size (MB): 42.44
+------------------------
+Total params: 22,729
+------------------------
+Total memory: 40.20MB
+Total MAdd: 2.27GMAdd
+Total Flops: 1.14GFlops
+Total MemR+W: 38.75MB
+```
+
 # Results
 
 The following are some images comparing the original High Resolution image vs Image up-sampled using Bi-cubic up-sampling vs Super Resolution using this model.
