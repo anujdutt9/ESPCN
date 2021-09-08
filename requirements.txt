@@ -1,4 +1,4 @@
-pillow~=8.2.0
+pillow>=8.2.0
 matplotlib~=3.4.2
 torch~=1.9.0
 numpy~=1.19.5
